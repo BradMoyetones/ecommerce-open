@@ -1,16 +1,20 @@
 "use client"
-import { BaggageClaim, Heart, ShoppingCart, User } from "lucide-react"
+import { BaggageClaim, DoorOpen, Heart, ShoppingCart, User, User2 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import MenuList from "./MenuList"
 import ItemsMenuMobile from "./items-menu-mobile"
 import ToggleTheme from "./ToggleTheme"
 import { useCart } from "@/hooks/useCart"
 import { useLovedProducts } from "@/hooks/useLovedProducts"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuShortcut, DropdownMenuTrigger } from "./ui/dropdown-menu"
+import { Button } from "./ui/button"
+import { useAuth } from "@/context/AuthContext"
 
 export default function Navbar() {
     const router = useRouter()
     const cart = useCart()
     const { lovedItems } = useLovedProducts()
+    const { user, logout } = useAuth()
 
     return (
         <div className="flex items-center justify-between p-4 mx-auto cursor-pointer sm:max-w-4xl md:max-w-6xl">
@@ -34,7 +38,31 @@ export default function Navbar() {
                     </div>
                 )}
                 <Heart strokeWidth="1" className={`cursor-pointer ${lovedItems.length > 0 && `fill-black dark:fill-white`}`} onClick={() => router.push("/loved-products")} />
-                <User strokeWidth="1" className="cursor-pointer" />
+                {user === null ? (
+                    <User strokeWidth="1" className="cursor-pointer" onClick={() => router.push("/login")} />
+                ): (
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <User strokeWidth="1" className="cursor-pointer" onClick={() => router.push("/login")} />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="w-56">
+                            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuGroup>
+                                <DropdownMenuItem>
+                                    <User className="mr-2 h-4 w-4" />
+                                    <span>Profile</span>
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator /> 
+                                <DropdownMenuItem onClick={() => logout()} className="cursor-pointer">
+                                    <DoorOpen className="mr-2 h-4 w-4" />
+                                    <span>LogOut</span>
+                                </DropdownMenuItem>
+                            </DropdownMenuGroup>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                )}
+                
                 <ToggleTheme />
             </div>
         </div>
